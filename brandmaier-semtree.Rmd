@@ -1,6 +1,6 @@
 ---
 title: "Leveraging the Boruta Algorithm for Variable Selection in Structural Equation Models"
-subtitle: "DGPs Congress Symposia: Methods and Applications of Modeling Technique"  
+subtitle: "DGPs Congress Symposia: Methods and Applications of Modeling Technique; Hörsaal 30"  
 author: 
   - "Andreas M. Brandmaier"
   - "Pryanka Paul"
@@ -37,333 +37,128 @@ style_duo_accent(
   secondary_color = "#FF961C",
   inverse_header_color = "#FFFFFF"
 )
+
+library(semtree)
+library(ggplot2)
+library(tidyverse)
 ```
 
-## Typography
+## Title
 
-Text can be **bold**, _italic_, ~~strikethrough~~, or `inline code`.
+<center><img src="img-downloaded/Boruta.jpg" height="400px" /></center>
 
-[Link to another slide](#colors).
+A spirit or devil from slavic mythology, <small>image from Wikipedia/Public Domain</small>
 
-### Lorem Ipsum
+## Idea
 
-Dolor imperdiet nostra sapien scelerisque praesent curae metus facilisis dignissim tortor. 
-Lacinia neque mollis nascetur neque urna velit bibendum. 
-Himenaeos suspendisse leo varius mus risus sagittis aliquet venenatis duis nec.
+- Create random copies of all predictors (_shadow features_)
+- Run a predictive model with original and shadow features
+- Compute a measure of variable importance
+- Only keep original predictors more important than shadow features
 
-- Dolor cubilia nostra nunc sodales
+## The End
 
-- Consectetur aliquet mauris blandit
+class: center middle inverse
 
-- Ipsum dis nec porttitor urna sed
+## Algorithm
 
----
-name: colors
+Preparation:
+- Choose an $alpha$-level for the statistical tests 
+- Choose a multiple-testing correction (from `stats::p.adjust.methods`): `r print(stats::p.adjust.methods)`
 
-## Colors
+## Algorithm
 
-.left-column[
-Text color
+- Create a copy of the original data set
+- Create shadow features by permutation of all non-rejected features (remove association of shadow features with outcome(s) )
+- At each iteration, compute z-score of all original and shadow features
+- A feature is considered relevant if it performs better than the best shadow feature
+- Run a statistical test for each original predictor 
+- If significant, tag predictor as 'relevant'
 
-[Link Color](#3)
+## Setting Alpha
 
-**Bold Color**
+-  $\alpha=0.05$ -> features need to outperform 95% of shadow features
+- $\alpha=0$ -> features need to outperform the best shadow features ($\max$-operator)
 
-_Italic Color_
+## Decision Trees
 
-`Inline Code`
-]
 
-.right-column[
-Lorem ipsum dolor sit amet, [consectetur adipiscing elit (link)](#3), 
-sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-Erat nam at lectus urna.
-Pellentesque elit ullamcorper **dignissim cras tincidunt (bold)** lobortis feugiat. 
-_Eros donec ac odio tempor_ orci dapibus ultrices. 
-Id porta nibh venenatis cras sed felis eget velit aliquet.
-Aliquam id diam maecenas ultricies mi.
-Enim sit amet 
-`code_color("inline")`
-venenatis urna cursus eget nunc scelerisque viverra.
-]
 
----
+## SEM
 
-# Big Topic or Inverse Slides `#`
+## SEM Trees
 
-## Slide Headings `##`
+## A minimal simulation
 
-### Sub-slide Headings `###`
-
-#### Bold Call-Out `####`
-
-This is a normal paragraph text. Only use header levels 1-4.
-
-##### Possible, but not recommended `#####`
-
-###### Definitely don't use h6 `######`
-
----
-
-# Left-Column Headings
-
-.left-column[
-## First
-
-## Second
-
-## Third
-]
-
-.right-column[
-Dolor quis aptent mus a dictum ultricies egestas.
-
-Amet egestas neque tempor fermentum proin massa!
-
-Dolor elementum fermentum pharetra lectus arcu pulvinar.
-]
-
----
 class: inverse center middle
 
-# Topic Changing Interstitial
+## Setup
 
---
-
+##
+```{r}
+tree_ex1 <- readRDS("results/ex1/tree.rds")
+plot(prune(tree_ex1,2))
 ```
-class: inverse center middle
-```
-
----
-layout: true
-
-## Blocks
-
----
-
-### Blockquote
-
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
-
----
-
-### Code Blocks
-
-#### R Code
-
-```{r eval=FALSE}
-ggplot(gapminder) +
-  aes(x = gdpPercap, y = lifeExp, size = pop, color = country) +
-  geom_point() +
-  facet_wrap(~year)
-```
-
-#### JavaScript
-
-```js
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
-```
-
----
-
-### More R Code
-
-```{r eval=FALSE}
-dplyr::starwars %>% dplyr::slice_sample(n = 4)
-```
-
----
-
-```{r message=TRUE, eval=requireNamespace("cli", quietly = TRUE)}
-cli::cli_alert_success("It worked!")
-```
-
---
-
-```{r message=TRUE}
-message("Just a friendly message")
-```
-
---
-
-```{r warning=TRUE}
-warning("This could be bad...")
-```
-
---
-
-```{r error=TRUE}
-stop("I hope you're sitting down for this")
-```
-
-
----
-layout: true
-
-## Tables
-
----
-exclude: `r if (requireNamespace("tibble", quietly=TRUE)) "false" else "true"`
-
-```{r eval=requireNamespace("tibble", quietly=TRUE)}
-tibble::as_tibble(mtcars)
-```
-
----
+## 
 
 ```{r}
-knitr::kable(head(mtcars), format = 'html')
+#vim<-readRDS("results/ex1/vi.rds")
+#plot(vim)
 ```
 
----
-exclude: `r if (requireNamespace("DT", quietly=TRUE)) "false" else "true"`
+```{mermaid}
+flowchart LR
+  A[Hard edge] --> B(Round edge)
+  B --> C{Decision}
+  C --> D[Result one]
+  C --> E[Result two]
+```
+##
 
-```{r eval=requireNamespace("DT", quietly=TRUE)}
-DT::datatable(head(mtcars), fillContainer = FALSE, options = list(pageLength = 4))
+```{r}
+readRDS("results/ex1/boruta_result.rds")
 ```
 
----
-layout: true
+## Let's fuse all three things!
 
-## Lists
+![](img/madscientist.png)
 
----
+## A minimal application
 
-.pull-left[
-#### Here is an unordered list:
-
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
-]
-
-.pull-right[
-
-#### And an ordered list:
-
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
-]
-
----
-
-### And a nested list:
-
-- level 1 item
-  - level 2 item
-  - level 2 item
-    - level 3 item
-    - level 3 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-
----
-
-### Nesting an ol in ul in an ol
-
-- level 1 item (ul)
-  1. level 2 item (ol)
-  1. level 2 item (ol)
-    - level 3 item (ul)
-    - level 3 item (ul)
-- level 1 item (ul)
-  1. level 2 item (ol)
-  1. level 2 item (ol)
-    - level 3 item (ul)
-    - level 3 item (ul)
-  1. level 4 item (ol)
-  1. level 4 item (ol)
-    - level 3 item (ul)
-    - level 3 item (ul)
-- level 1 item (ul)
-
----
-layout: true
-
-## Plots
-
----
-
-```{r plot-example, eval=requireNamespace("ggplot2", quietly=TRUE)}
-library(ggplot2)
-(g <- ggplot(mpg) + aes(hwy, cty, color = class) + geom_point())
+```{r}
+diabetes <- read.csv("data-downloaded/diabetes.csv")
+knitr::kable(tibble::as.tibble(diabetes))
 ```
 
----
+## Parallelization
 
-```{r plot-example-themed, eval=requireNamespace("showtext", quietly=TRUE) && requireNamespace("ggplot2", quietly=TRUE)}
-g + xaringanthemer::theme_xaringan(text_font_size = 16, title_font_size = 18) +
-  ggtitle("A Plot About Cars")
+- Iterations of BORUTA must remain sequential (because of possible rejections)
+
+- Parallelization of forests and variable importance calculation is costly and can be parallelized using `future`
+
+```{r}
+plan(multisession, workers = 4)
+
+boruta_result<-boruta(fitted_model, diabetes)
 ```
 
-.footnote[Requires `{showtext}`]
+# Thank You
 
----
-layout: false
+.left[
 
-## Square image
+1. https://github.com/brandmaier/boruta_presentation_dgps
+2. https://github.com/brandmaier/semtree
+3. Contact: andreas.brandmaier@medicalschool-berlin.de or @brandmaier on X or @brandmaier.bsky.social on Bluesky
 
-<center><img src="https://octodex.github.com/images/labtocat.png" alt="GithHub Octocat" height="400px" /></center>
-
-.footnote[GitHub Octocat]
-
----
-
-### Wide image
-
-![A wide image with a diagram of branching in git.](https://docs.github.com/assets/images/help/repository/branching.png)
-
-.footnote[Wide images scale to 100% slide width]
-
----
-
-## Two images
-
-.pull-left[
-![A GitHub Octocat, style "mother hubber"](https://octodex.github.com/images/motherhubbertocat.png)
 ]
 
-.pull-right[
-![A GitHub Octocat, style "dinotcat"](https://octodex.github.com/images/dinotocat.png)
-]
 
----
 
-### Definition lists can be used with HTML syntax.
+```{r, echo=FALSE}
+link <- "https://github.com/brandmaier/boruta_presentation_dgps"
+```
 
-<dl>
-<dt>Name</dt>
-<dd>Godzilla</dd>
-<dt>Born</dt>
-<dd>1952</dd>
-<dt>Birthplace</dt>
-<dd>Japan</dd>
-<dt>Color</dt>
-<dd>Green</dd>
-</dl>
-
----
-class: center, middle
-
-# Thanks!
-
-Slides created via the R packages:
-
-[**xaringan**](https://github.com/yihui/xaringan)<br>
-[gadenbuie/xaringanthemer](https://github.com/gadenbuie/xaringanthemer)
-
-The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+```{r, echo=FALSE, out.width = "30%", out.extra='style="float:center"'}
+generate_svg(qr_code(link), here::here("img/", "qr_slides.svg"), foreground = secondary_color, background = primary_color, show = FALSE)
+knitr::include_graphics("images/qr_slides.svg")
+```
