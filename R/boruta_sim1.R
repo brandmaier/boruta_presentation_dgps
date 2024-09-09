@@ -85,10 +85,9 @@ growthCurveModel <- mxRun(growthCurveModel)
 tree <- semtree(growthCurveModel, 
                 growth.data, control=semtree_control(method="score"))
 
-ct <- semforest_score_control(num.trees=50,
+ct <- semforest_score_control(num.trees=100,
                               control=semtree_control(
-                                method="score",
-                                max.depth=3
+                                method="score"
                               ))
 
 tic()
@@ -97,8 +96,12 @@ boruta_result <- boruta(growthCurveModel,
                         maxRuns = 11)
 toc()
 
+# took 4minutes for 50 trees with max.depth = 5
+
 semtree:::plot.boruta(boruta_result)
 
-if (!dir.exists("results/sim1")) mkdir("results/sim1")
-saveRDS(tree, "results/sim1/tree.rds")
+#semtree:::plot.boruta(boruta_result,type=1)+ scale_y_log10()
+
+if (!dir.exists("results/sim1")) dir.create("results/sim1")
+saveRDS(tree, file="results/sim1/tree.rds")
 saveRDS(boruta_result, "results/sim1/boruta_result.rds")

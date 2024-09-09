@@ -41,7 +41,10 @@ plot(vi)
 library(future)
 plan(multisession, workers = 4)
 plan(sequential)
-boruta_result<-boruta(fitted_model, diabetes, semforest_score_control(num.trees=30))
+boruta_result<-boruta(fitted_model,
+                      diabetes, 
+                      semforest_score_control(num.trees=30),
+                      nruns=11)
 
 # save everything
 dir.create("results/ex1")
