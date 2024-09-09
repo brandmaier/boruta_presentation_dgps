@@ -114,28 +114,30 @@ class: inverse, center, middle
 # A Simple Example: Wechsler Intelligence Scale for Children
 
 ```{r}
-knitr::include_graphics("img/spagetthi-all-large.pdf")
+#knitr::include_graphics("img/spagetthi-all-large.pdf")
+```
+<img href="img/spagetthi-all-large.pdf">
+---
+
+# A Simple Example: Wechsler Intelligence Scale for Children
+
+```{r}
+#knitr::include_graphics("img/tree-split-moedu.pdf")
+```
+<img href="img/tree-split-moedu.png">
+---
+
+# A Simple Example: Wechsler Intelligence Scale for Children
+
+```{r}
+knitr::include_graphics("img/tree-split-sex-large.png")
 ```
 ---
 
 # A Simple Example: Wechsler Intelligence Scale for Children
 
 ```{r}
-knitr::include_graphics("img/tree-split-moedu.pdf")
-```
----
-
-# A Simple Example: Wechsler Intelligence Scale for Children
-
-```{r}
-knitr::include_graphics("img/tree-split-sex-large.pdf")
-```
----
-
-# A Simple Example: Wechsler Intelligence Scale for Children
-
-```{r}
-knitr::include_graphics("img/tree-split-moedu-faedu-large.pdf")
+knitr::include_graphics("img/tree-split-moedu-faedu-large.png")
 ```
 ---
 
@@ -183,17 +185,20 @@ Preparation:
 
 -  $\alpha=0.05$ -> features need to outperform 95% of shadow features
 - $\alpha=0$ -> features need to outperform the best shadow features ($\max$-operator)
----
+
 ---
 ## Let's fuse all three things!
 
-![](img/madscientist.png)
+
+<center>
+<img href="img/madscientist.png" height="400px">
+
 ---
 
 
 ## A minimal simulation
-
 class: inverse center middle
+
 ---
 ## Setup
 
@@ -201,12 +206,13 @@ class: inverse center middle
 - Generate a dataset of $N=1000$
 - Compute outcome according to: 
 $$y = x1+5\cdot x2+0.1\cdot x6+\mathcal{N}(0,0.01)$$
-
+---
 ## A simple SEM tree
 ```{r}
 tree_ex1 <- readRDS("results/ex1/tree.rds")
 plot(semtree::prune(tree_ex1,2))
 ```
+---
 # Xs
 
 ```{r}
@@ -239,8 +245,14 @@ tree <- readRDS("results/ex3/tree.rds")
 plot(prune(tree,2))
 ```
 
+--- 
+
+# Example: DASS
+
+-
+
 ---
-## Parallelization
+# Parallelization
 
 - Iterations of BORUTA must remain sequential (because of possible rejections)
 

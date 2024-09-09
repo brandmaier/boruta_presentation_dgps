@@ -37,7 +37,8 @@ DASS_sum$hand <- factor(DASS_sum$hand, levels=1:3,
 #DASS_sum$married <- factor(DASS_sum$married,levels=1:3,
 #                           labels=c("never","currently","previously"))
 #DASS_sum$religion <- factor(DASS_sum$religion)
-DASS_sum$screensize <- factor(DASS_sum$screensize)
+DASS_sum$screensize <- factor(DASS_sum$screensize,levels=1:2,
+                              labels=c("small screen","big screen"))
 
 DASS_sum <- DASS_sum[complete.cases(DASS_sum),]
 manifests<-c("sumscore")
