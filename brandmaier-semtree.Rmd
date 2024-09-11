@@ -118,11 +118,11 @@ class: inverse, center, middle
 # A Simple Example: Wechsler Intelligence Scale for Children
 
 .pull-left[
-<img src="img/lgcm-model.png" style="width: 70%" />
+<img src="img/lgcm-model.png" style="width: 80%" />
 ]
 
 .pull-right[
-![](img/lgcm-predictions.png)
+![:scale 80%](img/lgcm-predictions.png)
 ]
 ---
 # A Simple Example: WISC
@@ -130,7 +130,7 @@ class: inverse, center, middle
 
 <center>
 
-![](img/spagetthi-all-large.png)
+![:scale 70%](img/spagetthi-all-large.png)
 
 ---
 
@@ -139,21 +139,21 @@ class: inverse, center, middle
 
 <center>
 
-![:scale 50%](img/tree-split-moedu.png)
+![:scale 70%](img/tree-split-moedu.png)
 
 ---
 
 # A Simple Example: WISC
 
 <center>
-![](img/tree-split-sex-large.png)
+![:scale 70%](img/tree-split-sex-large.png)
 
 ---
 
 # A Simple Example: WISC
 
 
-![](img/tree-split-moedu-faedu-large.png")
+![:scale 70%](img/tree-split-moedu-faedu-large.png)
 ---
 
 # Theory-guided exploration
@@ -168,15 +168,18 @@ class: inverse, center, middle
 .pull-left[
 - subsample data and predictors to create a forest with diverse predictor combinations
 - using a permutation approach, estimate contribution of each predictor
+<br>
+<small>`r Citet(bib,"brandmaier2016theory")` </small>
 ]
 
 .pull-right[
 <img src="img/varimp-example-soep.png" style="width: 50%">
-Terminal decline of happiness from SOEP data
-`r Citet(bib,"brandmaier2017terminal")` 
+<br>
+<small>Terminal decline of happiness from SOEP data
+`r Citet(bib,"brandmaier2017terminal")`</small> 
 ]
 
-<small>`r Citet(bib,"brandmaier2016theory")` </small>
+
 
 ---
 class: inverse, center, middle
@@ -241,6 +244,7 @@ plot(semtree::prune(tree_ex1,2))
 vim<-readRDS("results/ex1/vi.rds" )
 plot(vim)
 ```
+
 ---
 
 # BORUTA results
@@ -307,12 +311,10 @@ boruta_result<-boruta(sem_model, DASS_data)
 ---
 # Thank You
 
+Slides: https://github.com/brandmaier/boruta_presentation_dgps
 
 .pull-left[
-
-1. https://github.com/brandmaier/boruta_presentation_dgps
-2. https://github.com/brandmaier/semtree
-3. Contact: andreas.brandmaier@medicalschool-berlin.de or @brandmaier on X or @brandmaier.bsky.social on Bluesky
+Contact: andreas.brandmaier@medicalschool-berlin.de or @brandmaier on X or @brandmaier.bsky.social on Bluesky
 
 ]
 
@@ -323,9 +325,9 @@ link <- "https://github.com/brandmaier/boruta_presentation_dgps"
 ```
 
 ```{r, echo=FALSE, out.width = "30%", out.extra='style="float:center"'}
-if (!file.exists("img/qr_slides.svg")) {
+#if (!file.exists("img/qr_slides.svg")) {
 generate_svg(qr_code(link), here::here("img/", "qr_slides.svg"), foreground = secondary_color, background = primary_color, show = FALSE)
-}
+#}
 knitr::include_graphics("img/qr_slides.svg")
 ```
 ]
