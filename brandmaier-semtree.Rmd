@@ -12,6 +12,7 @@ output:
     chakra: libs/remark-latest.min.js
     css: xaringan-themer.css
     nature:
+      beforeInit: "macros.js"
       slideNumberFormat: "%current%"
       highlightStyle: github
       highlightLines: true
@@ -117,7 +118,7 @@ class: inverse, center, middle
 # A Simple Example: Wechsler Intelligence Scale for Children
 
 .pull-left[
-<img src="img/lgcm-model.png" style="width: 50%" />
+<img src="img/lgcm-model.png" style="width: 70%" />
 ]
 
 .pull-right[
@@ -126,34 +127,33 @@ class: inverse, center, middle
 ---
 # A Simple Example: WISC
 
-```{r}
-#knitr::include_graphics("img/spagetthi-all-large.pdf")
-```
+
+<center>
+
 ![](img/spagetthi-all-large.png)
+
 ---
 
 # A Simple Example: WISC
 
-```{r}
-#knitr::include_graphics("img/tree-split-moedu.pdf")
-```
-<img src="img/tree-split-moedu.png" height="50%">
+
+<center>
+
+![:scale 50%](img/tree-split-moedu.png)
+
 ---
 
 # A Simple Example: WISC
 
-```{r}
-knitr::include_graphics("img/tree-split-sex-large.png")
-```
-<img src="img/tree-split-sex-large.png" height="80%">
+<center>
+![](img/tree-split-sex-large.png)
+
 ---
 
 # A Simple Example: WISC
 
-```{r}
 
-```
-<img src="img/tree-split-moedu-faedu-large.png" height="60%">
+![](img/tree-split-moedu-faedu-large.png")
 ---
 
 # Theory-guided exploration
@@ -212,12 +212,14 @@ A spirit or devil from slavic mythology, <small>image from Wikipedia/Public Doma
 # Let's fuse all those things!
 
 <center>
-<img src="img/madscientist.png" style="height: 80%;" />
----
 
+![:scale 50%](img/madscientist.png)
+
+---
+class: inverse center middle
 
 # A minimal simulation
-class: inverse center middle
+
 
 ---
 # Setup
@@ -248,29 +250,16 @@ boruta_results <- readRDS("results/sim1/boruta_result.rds")
 plot(boruta_results)
 ```
 ---
-# A minimal application
+class: center middle inverse
 
-- We use the Pima Indian Diabetes dataset (used to predict diabetes from 8 medical markers)
-- Predictor variables includes the number of pregnancies the patient has had, their BMI, insulin level, age, 
-- Here, we use blood pressure as outcome; we use 
-
-```{r}
-diabetes <- read.csv("data-downloaded/diabetes.csv")
-knitr::kable(tibble::as.tibble(diabetes))
-```
----
-# First two levels of the tree
-```{r}
-tree <- readRDS("results/ex3/tree.rds")
-plot(prune(tree,2))
-```
-
+# Example: Depression Anxiety Stress Scales (DASS)
 --- 
 # Example: DASS
 
 - open data from openpsychometrics.org
 - data was collected with an online version of the Depression Anxiety Stress Scales (DASS) (http://www2.psy.unsw.edu.au/dass/)
 - 2df outcome model with mean and variance of the DASS sum score
+- predictors: age, education, gender, handedness, urban, family size, screen size, voted
 ---
 # SEM Tree with DASS
 
@@ -279,7 +268,7 @@ tree <- readRDS("results/ex3/tree.rds")
 plot(tree)
 ```
 ---
-# SEM Tree with DASS
+# SEM Tree with DASS (zoom in)
 
 ---
 ```{r}
@@ -304,7 +293,7 @@ plot(boruta_results)
 ```{r echo=TRUE, eval=FALSE}
 plan(multisession, workers = 4)
 
-boruta_result<-boruta(fitted_model, diabetes)
+boruta_result<-boruta(sem_model, DASS_data)
 ```
 ---
 
@@ -313,6 +302,7 @@ boruta_result<-boruta(fitted_model, diabetes)
 - BORUTA is a naive wrapper algorithm and computationally quite costly 
 - Difficult wording of "confirmation" and "rejection"
 - As always: type-I and type-II errors depend on sample size, effect size, multiple testing adjustments
+- Categorization really helpful for theory advancement?
 
 ---
 # Thank You
@@ -341,8 +331,6 @@ knitr::include_graphics("img/qr_slides.svg")
 ]
 ---
 # References
-
-- Gigerenzer, G., & Kurzenhäuser, S. (2005). Fast and Frugal Heuristics in Medical Decision Making. In R. Bibace, J. D. Laird, K. L. Noller, & J. Valsiner (Eds.), _Science and medicine in dialogue: Thinking through particulars and universals (pp. 3–15)_. Praeger Publishers/Greenwood Publishing Group.
 
 ```{r, results='asis', echo=FALSE}
 PrintBibliography(bib)
