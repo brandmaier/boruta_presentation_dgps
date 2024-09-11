@@ -6,8 +6,10 @@ author:
   - "Pryanka Paul"
   - "Timothy R. Brick"
 date: '`r Sys.Date()`'
+
 output:
   xaringan::moon_reader:
+    chakra: libs/remark-latest.min.js
     css: xaringan-themer.css
     nature:
       slideNumberFormat: "%current%"
@@ -28,6 +30,12 @@ knitr::opts_chunk$set(
   warning = FALSE,
   hiline = TRUE
 )
+
+
+library(RefManageR)
+BibOptions(check.entries = FALSE, bib.style = "authoryear", style = "markdown",
+           dashed = TRUE)
+bib <- ReadBib("references.bib")
 ```
 
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
@@ -63,9 +71,10 @@ library(ggplot2)
 library(tidyverse)
 library(svglite)
 library(qrcode)
+
 ```
 
----
+
 class: inverse center middle
 
 # Decision Trees + SEM + Random Forests + Variable Importance + BORUTA
@@ -74,16 +83,18 @@ class: inverse center middle
 Roadmap
 ---
 
-## Decision Trees
+# Decision Trees
 
 <center>
-![](img/coronary-tree.png)
+<img src="img/coronary-tree.png" height="400px">
 
-Gigerenzer & Kurzenhäuser, 2005
+`r Citet(bib, "gigerenzer2005fast")`
 
 ---
+ 
+# Data-driven modeling
 
-<img href="img/tg1.pdf">
+<img src="img/tg2.png">
 
 ---
 
@@ -92,83 +103,97 @@ Gigerenzer & Kurzenhäuser, 2005
 ```{r}
 knitr::include_graphics("img/SEM-measurement-structure.png")
 ```
+---
+# Theory-driven modeling
+<img src="img/tg1.png">
 
 ---
 class: inverse, center, middle
 # SEM Trees
 
-
+<small>`r Citet(bib, "brandmaier2013structural")`</small>
 ---
 
 # A Simple Example: Wechsler Intelligence Scale for Children
 
-.left[
-
-<img href="img/lgcm-model.png">
+.pull-left[
+<img src="img/lgcm-model.png" style="width: 50%" />
 ]
 
-.right[
-<img href="img/lgcm-predictions.png">
+.pull-right[
+![](img/lgcm-predictions.png)
 ]
 ---
-# A Simple Example: Wechsler Intelligence Scale for Children
+# A Simple Example: WISC
 
 ```{r}
 #knitr::include_graphics("img/spagetthi-all-large.pdf")
 ```
-<img href="img/spagetthi-all-large.pdf">
+![](img/spagetthi-all-large.png)
 ---
 
-# A Simple Example: Wechsler Intelligence Scale for Children
+# A Simple Example: WISC
 
 ```{r}
 #knitr::include_graphics("img/tree-split-moedu.pdf")
 ```
-<img href="img/tree-split-moedu.png">
+<img src="img/tree-split-moedu.png" height="50%">
 ---
 
-# A Simple Example: Wechsler Intelligence Scale for Children
+# A Simple Example: WISC
 
 ```{r}
 knitr::include_graphics("img/tree-split-sex-large.png")
 ```
+<img src="img/tree-split-sex-large.png" height="80%">
 ---
 
-# A Simple Example: Wechsler Intelligence Scale for Children
+# A Simple Example: WISC
 
 ```{r}
-knitr::include_graphics("img/tree-split-moedu-faedu-large.png")
+
 ```
+<img src="img/tree-split-moedu-faedu-large.png" height="60%">
 ---
 
-# LR criterion -> Surprise minimization
+# Theory-guided exploration
+<img src="img/tg3.png">
 
-```{r}
-knitr::include_graphics("img/sem-book.png")
-```
+<small>`r Citet(bib,"brandmaier2016theory")` </small>
 
 ---
 
-#
+# Variable Importance
 
-<center><img src="img-downloaded/800px-Boruta.jpg" height="400px" /></center>
+.pull-left[
+- subsample data and predictors to create a forest with diverse predictor combinations
+- using a permutation approach, estimate contribution of each predictor
+]
+
+.pull-right[
+<img src="img/varimp-example-soep.png" style="width: 50%">
+Terminal decline of happiness from SOEP data
+`r Citet(bib,"brandmaier2017terminal")` 
+]
+
+<small>`r Citet(bib,"brandmaier2016theory")` </small>
+
+---
+class: inverse, center, middle
+# BORUTA
+
+<center><img src="img-downloaded/800px-Boruta.jpg" style="height:400px" /></center>
 
 A spirit or devil from slavic mythology, <small>image from Wikipedia/Public Domain</small>
+
 ---
+
 # Idea
 
 - Create random copies of all predictors (_shadow features_)
 - Run a predictive model with original and shadow features
-- Compute a measure of variable importance
+- Compute a measure of variable importance from a SEM forest
 - Only keep original predictors more important than shadow features
-
----
-
-# Algorithm
-
-Preparation:
-- Choose an $alpha$-level for the statistical tests 
-- Choose a multiple-testing correction (from `stats::p.adjust.methods`): `r print(stats::p.adjust.methods)`
 
 ---
 
@@ -177,46 +202,41 @@ Preparation:
 - Create a copy of the original data set
 - Create shadow features by permutation of all non-rejected features (remove association of shadow features with outcome(s) )
 - At each iteration, compute z-score of all original and shadow features
-- A feature is considered relevant if it performs better than the best shadow feature
-- Run a statistical test for each original predictor 
-- If significant, tag predictor as 'relevant'
----
-## Setting Alpha
+- A feature is considered relevant if it performs better than the best shadow feature ('hit')
+- Run a statistical test for each original predictor (H0: hits so far are just random)
+- If significant, tag predictor as 'confirmed' or 'rejected', otherwise leave as 'tentative'
 
--  $\alpha=0.05$ -> features need to outperform 95% of shadow features
-- $\alpha=0$ -> features need to outperform the best shadow features ($\max$-operator)
+
 
 ---
-## Let's fuse all three things!
-
+# Let's fuse all those things!
 
 <center>
-<img href="img/madscientist.png" height="400px">
-
+<img src="img/madscientist.png" style="height: 80%;" />
 ---
 
 
-## A minimal simulation
+# A minimal simulation
 class: inverse center middle
 
 ---
-## Setup
+# Setup
 
 - Randomly draw $x1$ to $x6$ from ${0,1,2}$
 - Generate a dataset of $N=1000$
 - Compute outcome according to: 
 $$y = x1+5\cdot x2+0.1\cdot x6+\mathcal{N}(0,0.01)$$
 ---
-## A simple SEM tree
+# A simple SEM tree
 ```{r}
 tree_ex1 <- readRDS("results/ex1/tree.rds")
 plot(semtree::prune(tree_ex1,2))
 ```
 ---
-# Xs
+# Variable Importance
 
 ```{r}
-vim<-readRDS("results/ex1/vi.rds"             )
+vim<-readRDS("results/ex1/vi.rds" )
 plot(vim)
 ```
 ---
@@ -228,7 +248,7 @@ boruta_results <- readRDS("results/sim1/boruta_result.rds")
 plot(boruta_results)
 ```
 ---
-## A minimal application
+# A minimal application
 
 - We use the Pima Indian Diabetes dataset (used to predict diabetes from 8 medical markers)
 - Predictor variables includes the number of pregnancies the patient has had, their BMI, insulin level, age, 
@@ -246,10 +266,33 @@ plot(prune(tree,2))
 ```
 
 --- 
-
 # Example: DASS
 
--
+- open data from openpsychometrics.org
+- data was collected with an online version of the Depression Anxiety Stress Scales (DASS) (http://www2.psy.unsw.edu.au/dass/)
+- 2df outcome model with mean and variance of the DASS sum score
+---
+# SEM Tree with DASS
+
+```{r}
+tree <- readRDS("results/ex3/tree.rds")
+plot(tree)
+```
+---
+# SEM Tree with DASS
+
+---
+```{r}
+tree <- readRDS("results/ex3/tree.rds")
+plot(semtree::prune(tree,2))
+```
+---
+
+# Example: DASS
+```{r}
+boruta_results<-readRDS("results/ex3/boruta_results_run2.rds")
+plot(boruta_results)
+```
 
 ---
 # Parallelization
@@ -264,10 +307,18 @@ plan(multisession, workers = 4)
 boruta_result<-boruta(fitted_model, diabetes)
 ```
 ---
+
+# Discussion
+
+- BORUTA is a naive wrapper algorithm and computationally quite costly 
+- Difficult wording of "confirmation" and "rejection"
+- As always: type-I and type-II errors depend on sample size, effect size, multiple testing adjustments
+
+---
 # Thank You
 
 
-.left[
+.pull-left[
 
 1. https://github.com/brandmaier/boruta_presentation_dgps
 2. https://github.com/brandmaier/semtree
@@ -275,7 +326,7 @@ boruta_result<-boruta(fitted_model, diabetes)
 
 ]
 
-
+.pull-right[
 
 ```{r, echo=FALSE}
 link <- "https://github.com/brandmaier/boruta_presentation_dgps"
@@ -287,8 +338,12 @@ generate_svg(qr_code(link), here::here("img/", "qr_slides.svg"), foreground = se
 }
 knitr::include_graphics("img/qr_slides.svg")
 ```
-
+]
 ---
 # References
 
 - Gigerenzer, G., & Kurzenhäuser, S. (2005). Fast and Frugal Heuristics in Medical Decision Making. In R. Bibace, J. D. Laird, K. L. Noller, & J. Valsiner (Eds.), _Science and medicine in dialogue: Thinking through particulars and universals (pp. 3–15)_. Praeger Publishers/Greenwood Publishing Group.
+
+```{r, results='asis', echo=FALSE}
+PrintBibliography(bib)
+```
