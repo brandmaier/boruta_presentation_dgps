@@ -51,7 +51,7 @@ DASS_sum$screensize <- factor(DASS_sum$screensize,levels=1:2,
 DASS_sum <- DASS_sum[complete.cases(DASS_sum),]
 
 # subsample
-DASS_sum <- DASS_sum[sample(1:nrow(DASS_sum),size = 5000, TRUE)]
+#DASS_sum <- DASS_sum[sample(1:nrow(DASS_sum),size = 5000, TRUE)]
 
 manifests<-c("sumscore")
 latents<-c()

@@ -36,6 +36,9 @@ knitr::opts_chunk$set(
 library(RefManageR)
 BibOptions(check.entries = FALSE, bib.style = "authoryear", style = "markdown",
            dashed = TRUE)
+
+BibOptions(hyperlink=FALSE);
+
 bib <- ReadBib("references.bib")
 ```
 
@@ -112,25 +115,29 @@ knitr::include_graphics("img/SEM-measurement-structure.png")
 class: inverse, center, middle
 # SEM Trees
 
-<small>`r Citet(bib, "brandmaier2013structural")`</small>
 ---
 
 # A Simple Example: Wechsler Intelligence Scale for Children
 
 .pull-left[
-<img src="img/lgcm-model.png" style="width: 80%" />
+<img src="img/lgcm-model.png" style="width: 70%" />
 ]
 
 .pull-right[
 ![:scale 80%](img/lgcm-predictions.png)
 ]
+
+<small>`r Citet(bib, "brandmaier2013structural")`</small>
+
 ---
 # A Simple Example: WISC
 
 
 <center>
 
-![:scale 70%](img/spagetthi-all-large.png)
+![:scale 60%](img/spagetthi-all-large.png)
+
+<small>N=204 children, McArdle & Epstein, 1987</small>
 
 ---
 
@@ -152,8 +159,8 @@ class: inverse, center, middle
 
 # A Simple Example: WISC
 
-
-![:scale 70%](img/tree-split-moedu-faedu-large.png)
+<center>
+![:scale 55%](img/tree-split-moedu-faedu-large.png)
 ---
 
 # Theory-guided exploration
@@ -167,16 +174,14 @@ class: inverse, center, middle
 
 .pull-left[
 - subsample data and predictors to create a forest with diverse predictor combinations
-- using a permutation approach, estimate contribution of each predictor
-<br>
-<small>`r Citet(bib,"brandmaier2016theory")` </small>
+- using a permutation approach, estimate contribution of each predictor `r Citet(bib,"brandmaier2016theory")`
+- Example: Terminal decline of happiness from SOEP data
+`r Citet(bib,"brandmaier2017terminal")`
 ]
 
 .pull-right[
-<img src="img/varimp-example-soep.png" style="width: 50%">
-<br>
-<small>Terminal decline of happiness from SOEP data
-`r Citet(bib,"brandmaier2017terminal")`</small> 
+<img src="img/varimp-example-soep.png" style="width: 140%">
+
 ]
 
 
@@ -190,13 +195,11 @@ class: inverse, center, middle
 A spirit or devil from slavic mythology, <small>image from Wikipedia/Public Domain</small>
 
 ---
+class: inverse middle center
+# Shadow features
 
-# Idea
-
-- Create random copies of all predictors (_shadow features_)
-- Run a predictive model with original and shadow features
-- Compute a measure of variable importance from a SEM forest
-- Only keep original predictors more important than shadow features
+Create random copies of all predictors (_shadow features_)
+ features; keep predictors outperforming shadow features `r  Citep(bib, "boruta")`
 
 ---
 
@@ -204,20 +207,21 @@ A spirit or devil from slavic mythology, <small>image from Wikipedia/Public Doma
 
 - Create a copy of the original data set
 - Create shadow features by permutation of all non-rejected features (remove association of shadow features with outcome(s) )
-- At each iteration, compute z-score of all original and shadow features
+- Run a SEM forest and variable importance
 - A feature is considered relevant if it performs better than the best shadow feature ('hit')
 - Run a statistical test for each original predictor (H0: hits so far are just random)
 - If significant, tag predictor as 'confirmed' or 'rejected', otherwise leave as 'tentative'
-
+- plot!
 
 
 ---
-# Let's fuse all those things!
+# Us combining SEM forests and BORUTA
 
 <center>
 
-![:scale 50%](img/madscientist.png)
+![:scale 40%](img/madscientist2.png)
 
+(according to ChatGPT)
 ---
 class: inverse center middle
 
@@ -227,22 +231,17 @@ class: inverse center middle
 ---
 # Setup
 
-- Randomly draw $x1$ to $x6$ from ${0,1,2}$
+- Randomly draw ordinal $x1$ to $x6$ from ${0,1,2}$
 - Generate a dataset of $N=1000$
 - Compute outcome according to: 
-$$y = x1+5\cdot x2+0.1\cdot x6+\mathcal{N}(0,0.01)$$
+$$y = 2\cdot x1+1\cdot x2+0.1\cdot x3+\mathcal{N}(0,0.01)$$
+- Run BORUTA with 100 trees per forest for 11 runs
+- Outcome model with only mean of $y$ (basically like CART)
 ---
 # A simple SEM tree
 ```{r}
-tree_ex1 <- readRDS("results/ex1/tree.rds")
+tree_ex1 <- readRDS("results/sim2/tree.rds")
 plot(semtree::prune(tree_ex1,2))
-```
----
-# Variable Importance
-
-```{r}
-vim<-readRDS("results/ex1/vi.rds" )
-plot(vim)
 ```
 
 ---
@@ -250,20 +249,24 @@ plot(vim)
 # BORUTA results
 
 ```{r}
-boruta_results <- readRDS("results/sim1/boruta_result.rds")
+boruta_results <- readRDS("results/sim2/boruta_result.rds")
 plot(boruta_results)
 ```
 ---
 class: center middle inverse
 
 # Example: Depression Anxiety Stress Scales (DASS)
---- 
+
+---
+
 # Example: DASS
 
 - open data from openpsychometrics.org
 - data was collected with an online version of the Depression Anxiety Stress Scales (DASS) (http://www2.psy.unsw.edu.au/dass/)
 - 2df outcome model with mean and variance of the DASS sum score
 - predictors: age, education, gender, handedness, urban, family size, screen size, voted
+- $N=38,385$ complete cases (after some data cleaning)
+
 ---
 # SEM Tree with DASS
 
@@ -274,8 +277,7 @@ plot(tree)
 ---
 # SEM Tree with DASS (zoom in)
 
----
-```{r}
+```{r out.height="80%", out.width="80%"}
 tree <- readRDS("results/ex3/tree.rds")
 plot(semtree::prune(tree,2))
 ```
@@ -301,12 +303,21 @@ boruta_result<-boruta(sem_model, DASS_data)
 ```
 ---
 
-# Discussion
+# Why you should not use it
 
 - BORUTA is a naive wrapper algorithm and computationally quite costly 
-- Difficult wording of "confirmation" and "rejection"
+--
+
 - As always: type-I and type-II errors depend on sample size, effect size, multiple testing adjustments
-- Categorization really helpful for theory advancement?
+--
+
+- Difficult implications of "confirmation" and "rejection"
+--
+
+- Categorization hardly really helpful for theory advancement
+--
+
+- No short cut to a new theory
 
 ---
 # Thank You
@@ -314,7 +325,7 @@ boruta_result<-boruta(sem_model, DASS_data)
 Slides: https://github.com/brandmaier/boruta_presentation_dgps
 
 .pull-left[
-Contact: andreas.brandmaier@medicalschool-berlin.de or @brandmaier on X or @brandmaier.bsky.social on Bluesky
+Contact: andreas.brandmaier@medicalschool-berlin.de or @brandmaier on X or .strong[@brandmaier.bsky.social] on Bluesky or .strong[https://www.brandmaier.de]
 
 ]
 
@@ -334,6 +345,8 @@ knitr::include_graphics("img/qr_slides.svg")
 ---
 # References
 
+.small[
 ```{r, results='asis', echo=FALSE}
 PrintBibliography(bib)
 ```
+]

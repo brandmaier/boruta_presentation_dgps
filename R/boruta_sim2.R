@@ -8,13 +8,13 @@ x3 <- sample(c(0,1,2),size=N, TRUE)
 x4 <- sample(c(0,1,2),size=N, TRUE)
 x5 <- sample(c(0,1,2),size=N, TRUE)
 x6 <- sample(c(0,1,2),size=N, TRUE)
-y <- x1+5*x2+0.1*x6+rnorm(N,0,0.01)
+y <- 2*x1+1*x2+0.1*x3+rnorm(N,0,0.01)
 
 tree.data <- data.frame(y,x1=ordered(x1),x2=ordered(x2),
                         x3=ordered(x3),x4=ordered(x4),x5=ordered(x5),
                         x6=ordered(x6))
 
-set.seed(2349)
+set.seed(23496)
 
 manifests<-c("y")
 latents<-c()
@@ -43,17 +43,21 @@ tree = semtree( model = model,
                 control=ctrl)
 
 
-tctrl <- semforest.control(control = semtree.control(method="score",alpha=0.05))
+tctrl <- semforest.control(control = 
+                             semtree.control(method="score",
+                                             alpha=0.05),
+                           num.trees = 50)
 
 library(future)
 plan(multisession, workers = 4)
 boruta_result <- semtree::boruta(model=fitted,
                                  control=tctrl, 
-                                 data = tree.data)
+                                 data = tree.data,maxRuns = 11)
 
 boruta_result
 
 semtree:::plot.boruta(boruta_result)
 
 dir.create("results/sim2")
+saveRDS(tree, file="results/sim2/tree.rds")
 saveRDS(boruta_result, file="results/sim2/boruta_result.rds")
