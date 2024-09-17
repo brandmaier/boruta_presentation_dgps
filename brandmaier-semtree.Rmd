@@ -77,16 +77,39 @@ library(svglite)
 library(qrcode)
 
 ```
+class: center middle
 
+# Question: “Given a multivariate model, which predictors/covariates are relevant?
+
+---
 
 class: inverse center middle
 
-# Decision Trees + SEM + Random Forests + Variable Importance + BORUTA
+# SEM + Decision Trees + Random Forests + Variable Importance + BORUTA
 
 
 Roadmap
 ---
 
+
+
+# SEM
+
+```{r}
+knitr::include_graphics("img/SEM-measurement-structure.png")
+```
+---
+class: center
+# Commercial Break: Ωnyx
+
+![:scale 60%](img/onyx-lavaan-screenshot2.png)
+
+https://onyx-sem.com/
+---
+# Theory-driven modeling
+<img src="img/tg1.png">
+
+---
 # Decision Trees
 
 <center>
@@ -99,17 +122,6 @@ Roadmap
 # Data-driven modeling
 
 <img src="img/tg2.png">
-
----
-
-# SEM
-
-```{r}
-knitr::include_graphics("img/SEM-measurement-structure.png")
-```
----
-# Theory-driven modeling
-<img src="img/tg1.png">
 
 ---
 class: inverse, center, middle
@@ -173,10 +185,10 @@ class: inverse, center, middle
 # Variable Importance
 
 .pull-left[
-- subsample data and predictors to create a forest with diverse predictor combinations
-- using a permutation approach, estimate contribution of each predictor `r Citet(bib,"brandmaier2016theory")`
+- single trees are unstable ->  subsample data and predictors to create a forest with diverse predictor combinations
+- using a permutation approach, estimate contribution of each predictor `r Citep(bib,"brandmaier2016theory")`
 - Example: Terminal decline of happiness from SOEP data
-`r Citet(bib,"brandmaier2017terminal")`
+`r Citep(bib,"brandmaier2017terminal")`
 ]
 
 .pull-right[
@@ -208,10 +220,10 @@ Create random copies of all predictors (_shadow features_)
 - Create a copy of the original data set
 - Create shadow features by permutation of all non-rejected features (remove association of shadow features with outcome(s) )
 - Run a SEM forest and variable importance
-- A feature is considered relevant if it performs better than the best shadow feature ('hit')
-- Run a statistical test for each original predictor (H0: hits so far are just random)
-- If significant, tag predictor as 'confirmed' or 'rejected', otherwise leave as 'tentative'
-- plot!
+- A feature is considered relevant if it performs better than the best shadow feature (**'hit'**)
+- Run a statistical test for each original predictor (H0: predictor performs like max of shadow features)
+- If significant, tag predictor as **'confirmed'** or **'rejected'**, otherwise leave as **'tentative'**
+- repeat until no tentative features (or too may iterations)
 
 
 ---
@@ -225,7 +237,7 @@ Create random copies of all predictors (_shadow features_)
 ---
 class: inverse center middle
 
-# A minimal simulation
+# A minimal proof of concept
 
 
 ---
@@ -245,6 +257,12 @@ plot(semtree::prune(tree_ex1,2))
 ```
 
 ---
+# Variable importance
+```{r}
+boruta_results <- readRDS("results/sim2/boruta_result.rds")
+barplot(simplify2array(boruta_results$impHistory[1,1:6]))
+```
+---
 
 # BORUTA results
 
@@ -263,7 +281,7 @@ class: center middle inverse
 
 - open data from openpsychometrics.org
 - data was collected with an online version of the Depression Anxiety Stress Scales (DASS) (http://www2.psy.unsw.edu.au/dass/)
-- 2df outcome model with mean and variance of the DASS sum score
+- 2df outcome model with mean and variance of the DASS sum score (42 items)
 - predictors: age, education, gender, handedness, urban, family size, screen size, voted
 - $N=38,385$ complete cases (after some data cleaning)
 
@@ -290,17 +308,20 @@ plot(boruta_results)
 ```
 
 ---
-# Parallelization
 
-- Iterations of BORUTA must remain sequential (because of possible rejections)
 
-- Parallelization of forests and variable importance calculation is costly and can be parallelized using `future`
+# Max-Operator
 
-```{r echo=TRUE, eval=FALSE}
-plan(multisession, workers = 4)
+`max()`-operator on the shadow importance is problematic:
 
-boruta_result<-boruta(sem_model, DASS_data)
-```
+- the more shadow features, the larger the expected value of the maximum over all shadow features
+
+- the threshold of relevance changes depending on the number of initial features
+
+- as features get rejected, the threshold tends gets lower
+
+Possible fix: quantile instead of max?
+
 ---
 
 # Why you should not use it
